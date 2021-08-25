@@ -33,6 +33,10 @@ import matplotlib.pyplot as plt
 import images2gif
 from images2gif import writeGif
 
+mgc = get_ipython().magic
+mgc(u'matplotlib inline')
+pylab.rcParams['figure.figsize'] = (10.0, 10.0)
+
 class Sampler():
   def __init__(self, z_dim = 8, c_dim = 1, scale = 10.0, net_size = 32):
     self.cppn = CPPN(z_dim = z_dim, c_dim = c_dim, scale = scale, net_size = net_size)
