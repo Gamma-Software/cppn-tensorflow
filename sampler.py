@@ -22,7 +22,7 @@ sampler = Sampler(z_dim = 4, c_dim = 1, scale = 8.0, net_size = 32)
 '''
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import math
 import random
 import PIL
@@ -33,9 +33,9 @@ import matplotlib.pyplot as plt
 import images2gif
 from images2gif import writeGif
 
-mgc = get_ipython().magic
-mgc(u'matplotlib inline')
-pylab.rcParams['figure.figsize'] = (10.0, 10.0)
+#mgc = get_ipython().magic
+#mgc(u'matplotlib inline')
+#pylab.rcParams['figure.figsize'] = (10.0, 10.0)
 
 class Sampler():
   def __init__(self, z_dim = 8, c_dim = 1, scale = 10.0, net_size = 32):
@@ -104,7 +104,7 @@ class Sampler():
     for i in range(total_frames):
       z = z1 + delta_z*float(i)
       images.append(self.to_image(self.generate(z, x_dim, y_dim, scale)))
-      print "processing image ", i
+      print("processing image ", i)
     durations = [duration1]+[duration]*n_frame+[duration2]
     if reverse == True: # go backwards in time back to the first state
       revImages = list(images)
@@ -112,5 +112,5 @@ class Sampler():
       revImages = revImages[1:]
       images = images+revImages
       durations = durations + [duration]*n_frame + [duration1]
-    print "writing gif file..."
+    print("writing gif file...")
     writeGif(filename, images, duration = durations)

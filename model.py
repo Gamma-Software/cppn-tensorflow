@@ -8,7 +8,7 @@ https://en.wikipedia.org/wiki/Compositional_pattern-producing_network
 '''
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from ops import *
 
 class CPPN():

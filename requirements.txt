@@ -1,0 +1,11 @@
+keras==2.6.0
+Keras-Preprocessing==1.1.2
+matplotlib==3.4.3
+matplotlib-inline
+numpy==1.19.5
+Pillow==8.3.1
+tensorboard==2.6.0
+tensorboard-data-server==0.6.1
+tensorboard-plugin-wit==1.8.0
+tensorflow==2.6.0
+tensorflow-estimator==2.6.0
