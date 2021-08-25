@@ -12,7 +12,7 @@ import tensorflow.compat.v1 as tf
 from ops import *
 
 class CPPN():
-  def __init__(self, batch_size=1, z_dim = 32, c_dim = 1, scale = 8.0, net_size = 32):
+  def __init__(self, batch_size=1, z_dim = 32, c_dim = 1, scale = 8.0, net_size = 32, mode="3tan"):
     """
 
     Args:
@@ -49,7 +49,7 @@ class CPPN():
     self.r = tf.placeholder(tf.float32, [self.batch_size, None, 1])
 
     # builds the generator network
-    self.G = self.generator(x_dim = self.x_dim, y_dim = self.y_dim)
+    self.G = self.generator(x_dim = self.x_dim, y_dim = self.y_dim, mode=mode)
 
     self.init()
 
@@ -80,7 +80,7 @@ class CPPN():
     r_mat = np.tile(r_mat.flatten(), self.batch_size).reshape(self.batch_size, n_points, 1)
     return x_mat, y_mat, r_mat
 
-  def generator(self, x_dim, y_dim, reuse = False, mode = "3tan"):
+  def generator(self, x_dim, y_dim, mode, reuse = False):
 
     if reuse:
         tf.get_variable_scope().reuse_variables()
@@ -169,7 +169,7 @@ class CPPN():
     output = tf.sigmoid(fully_connected(H, self.c_dim, 'g_final'))
     return tf.reshape(output, [self.batch_size, y_dim, x_dim, self.c_dim])
 
-  def generate(self, z=None, x_dim = 26, y_dim = 26, scale = 8.0):
+  def generate(self, z=None, x_dim = 26, y_dim = 26, scale = 8.0, mode="3tan_sigmoid"):
     """ Generate data by sampling from latent space.
 
     If z is not None, data for this point in latent space is
@@ -181,7 +181,7 @@ class CPPN():
     # Note: This maps to mean of distribution, we could alternatively
     # sample from Gaussian distribution
 
-    G = self.generator(x_dim = x_dim, y_dim = y_dim, reuse = True)
+    G = self.generator(x_dim = x_dim, y_dim = y_dim, reuse = True, mode=mode)
     x_vec, y_vec, r_vec = self._coordinates(x_dim, y_dim, scale = scale)
     image = self.sess.run(G, feed_dict={self.z: z, self.x: x_vec, self.y: y_vec, self.r: r_vec})
     return image

@@ -42,13 +42,13 @@ class Sampler():
   def generate_z(self):
     z = np.random.uniform(-1.0, 1.0, size=(1, self.cppn.z_dim)).astype(np.float32)
     return z
-  def generate(self, z=None, x_dim=1080, y_dim=1060, scale = 10.0):
+  def generate(self, z=None, x_dim=1080, y_dim=1060, scale = 10.0, mode="3tan_sigmoid"):
     if z is None:
       z = self.generate_z()
     else:
       z = np.reshape(z, (1, self.cppn.z_dim))
     self.z = z
-    return self.cppn.generate(z, x_dim, y_dim, scale)[0]
+    return self.cppn.generate(z, x_dim, y_dim, scale, mode=mode)[0]
   def show_image(self, image_data):
     '''
     image_data is a tensor, in [height width depth]
