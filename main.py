@@ -31,6 +31,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     #sampler = Sampler(z_dim = 4, c_dim = 1 if args.color == "bw" else 3, scale = 8.0, net_size = 32)
+    #sampler = Sampler(z_dim = 6, c_dim = 3, scale = 8.0, net_size = 16) # NICE COLORS
+    #sampler = Sampler(z_dim = 8, c_dim = 1, scale = 8.0, net_size = 16) # VERY GLORY
     sampler = Sampler(z_dim = 6, c_dim = 1, scale = 8.0, net_size = 24)
 
     files = list()
