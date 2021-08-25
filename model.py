@@ -80,7 +80,7 @@ class CPPN():
     r_mat = np.tile(r_mat.flatten(), self.batch_size).reshape(self.batch_size, n_points, 1)
     return x_mat, y_mat, r_mat
 
-  def generator(self, x_dim, y_dim, reuse = False):
+  def generator(self, x_dim, y_dim, reuse = False, mode = "3tan"):
 
     if reuse:
         tf.get_variable_scope().reuse_variables()
@@ -111,63 +111,63 @@ class CPPN():
     ### Example: 3 layers of tanh() layers, with net_size = 32 activations/layer
     ###
     #'''
-    H = tf.nn.tanh(U)
-    for i in range(3):
-      H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_'+str(i)))
-    output = tf.sigmoid(fully_connected(H, self.c_dim, 'g_final'))
+    if mode == "3tan_sigmoid":
+      H = tf.nn.tanh(U)
+      for i in range(3):
+        H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_'+str(i)))
+      output = tf.sigmoid(fully_connected(H, self.c_dim, 'g_final'))
+      return tf.reshape(output, [self.batch_size, y_dim, x_dim, self.c_dim])
     #'''
 
     ###
     ### Similar to example above, but instead the output is
     ### a weird function rather than just the sigmoid
-    '''
-    H = tf.nn.tanh(U)
-    for i in range(3):
-      H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_'+str(i)))
-    output = tf.sqrt(1.0-tf.abs(tf.tanh(fully_connected(H, self.c_dim, 'g_final'))))
-    '''
+    
+    if mode == "3tan_sqrt":
+      H = tf.nn.tanh(U)
+      for i in range(3):
+        H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_'+str(i)))
+      output = tf.sqrt(1.0-tf.abs(tf.tanh(fully_connected(H, self.c_dim, 'g_final'))))
+      return tf.reshape(output, [self.batch_size, y_dim, x_dim, self.c_dim])
+    
 
     ###
     ### Example: mixing softplus and tanh layers, with net_size = 32 activations/layer
     ###
-    '''
-    H = tf.nn.tanh(U)
-    H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_1'))
-    H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_2'))
-    H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_2'))
-    H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_2'))
-    H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_2'))
-    output = tf.sigmoid(fully_connected(H, self.c_dim, 'g_final'))
-    '''
+    
+    if mode == "tan_softplus":
+      H = tf.nn.tanh(U)
+      H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_1'))
+      H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_2'))
+      H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_2'))
+      H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_2'))
+      H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_2'))
+      output = tf.sigmoid(fully_connected(H, self.c_dim, 'g_final'))
+      return tf.reshape(output, [self.batch_size, y_dim, x_dim, self.c_dim])
+    
 
     ###
     ### Example: mixing sinusoids, tanh and multiple softplus layers
     ###
-    '''
-    H = tf.nn.tanh(U)
-    H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_1'))
-    H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_2'))
-    H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_2'))
-    output = 0.5 * tf.sin(fully_connected(H, self.c_dim, 'g_final')) + 0.5
-    '''
-
+    if mode == "sigmoid_tan_softplus":
+      H = tf.nn.tanh(U)
+      H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_1'))
+      H = tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_2'))
+      H = tf.nn.softplus(fully_connected(H, net_size, 'g_softplus_2'))
+      output = 0.5 * tf.sin(fully_connected(H, self.c_dim, 'g_final')) + 0.5
+      return tf.reshape(output, [self.batch_size, y_dim, x_dim, self.c_dim])
+    
     ###
     ### Example: residual network of 4 tanh() layers
     ###
-    '''
+    if mode == "4residualtan":
+      pass
+
     H = tf.nn.tanh(U)
     for i in range(3):
-      H = H+tf.nn.tanh(fully_connected(H, net_size, g_tanh_'+str(i)))
+      H = H+tf.nn.tanh(fully_connected(H, net_size, 'g_tanh_'+str(i)))
     output = tf.sigmoid(fully_connected(H, self.c_dim, 'g_final'))
-    '''
-
-    '''
-    The final hidden later is pass thru a fully connected sigmoid later, so outputs -> (0, 1)
-    Also, the output has a dimention of c_dim, so can be monotone or RGB
-    '''
-    result = tf.reshape(output, [self.batch_size, y_dim, x_dim, self.c_dim])
-
-    return result
+    return tf.reshape(output, [self.batch_size, y_dim, x_dim, self.c_dim])
 
   def generate(self, z=None, x_dim = 26, y_dim = 26, scale = 8.0):
     """ Generate data by sampling from latent space.
