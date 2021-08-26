@@ -67,10 +67,10 @@ Usefull links
 
 import os, time
 
+from numpy.lib.arraysetops import isin
+
 def encode(x):
-  if False:
-    return x.encode('utf-8')
-  return x
+  return x.encode('utf-8')
 
 try:
     import PIL
@@ -145,6 +145,10 @@ def intToBin(i):
     i1 = i % 256
     i2 = int( i/256)
     # make string (little endian)
+    if not isinstance(i1, int):
+        i1 = i1[0]
+    if not isinstance(i2, int):
+        i2 = i2[0]
     return chr(i1) + chr(i2)
 
 
@@ -349,7 +353,7 @@ class GifWriter:
                 y0, y1 = 0, 2
 
             # Cut out and store
-            im2 = im[y0:y1,x0:x1]
+            im2 = im[y0[0]:y1[0],x0[0]:x1[0]]
             prev = im
             ims2.append(im2)
             xy.append((x0,y0))

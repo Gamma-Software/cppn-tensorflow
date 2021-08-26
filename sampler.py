@@ -21,6 +21,7 @@ sampler = Sampler(z_dim = 4, c_dim = 1, scale = 8.0, net_size = 32)
 
 '''
 
+import imageio
 import numpy as np
 import tensorflow.compat.v1 as tf
 import math
@@ -101,6 +102,13 @@ class Sampler():
       z = z1 + delta_z*float(i)
       images.append(self.to_image(self.generate(z, x_dim, y_dim, scale)))
       print("processing image ", i)
+    if reverse:
+        for img in reversed(images[1:-1]):
+            images.append(img)
+
+    imageio.mimsave(filename, images, duration=duration, loop=1)
+
+    return True
     durations = [duration1]+[duration]*n_frame+[duration2]
     if reverse == True: # go backwards in time back to the first state
       revImages = list(images)
